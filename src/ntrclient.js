@@ -1,7 +1,7 @@
 import { connect } from 'net';
 import PullStream from 'pullstream';
 import Promise from 'bluebird';
-
+import {readFileSync} from 'fs';
 PullStream.prototype.pullAsync = Promise.promisify(PullStream.prototype.pull);
 
 export default class NtrClient {
@@ -304,7 +304,10 @@ export default class NtrClient {
 
     this.seqNumber += 1000;
   }
-
+  /*
+  name is a String containing the filename
+  data is a buffer containing the binary data of the file
+   */
   saveFile(name, data) {
     const nameBuffer = Buffer.alloc(200);
     nameBuffer.write(name);
@@ -411,4 +414,13 @@ export default class NtrClient {
         let argsarry = [(priorityMode << 8 | priorityFactor),quality,num1];
         this.sendPacket(0,901,argsarry,0);
     }
+    /*
+    localpath is a path string to a file on the hardrive
+    remotepath is a path string to a file that may or may not exist on the 3ds
+     */
+    sendfile(localpath, remotepath)
+    {
+        this.saveFile(remotepath,readFileSync(localpath));
+    }
+
 }
